@@ -18,9 +18,16 @@ function fetch (child) {
 		return Promise.resolve(cache.get(child))
 	} else {
 		return new Promise((resolve, reject) => {
-			Axios.get('/api/' + child).then(res => {
-				
+			Axios.get('/api/item/' + child + '/').then(res => {
+				const val = res.data
+				if (val) val.__lastUpdate = Date.now()
+				cache && cache.set(child, val)
+				resolve(val)
 			}).catch(reject)
 		})
 	}
+}
+
+export function fetchIdsByType (type) {
+
 }
