@@ -14,7 +14,7 @@ module.exports = {
 		]
 	},
 	output: {
-		path: path.resolve(__dirname, '../dist')
+		path: path.resolve(__dirname, '../dist'),
 		publicPath: '/dist/',
 		filename: '[name]-[chunkhash].js'
 	},
@@ -30,32 +30,41 @@ module.exports = {
 		rules: [
 			{
 				test: /\.vue$/,
-				use: 'vue-loader',
-				options: vueConfig
-			},
-			{
-				test: /\.js$/,
-				use: 'buble-loader',
-				exclude: /node_modeles/,
-				options: {
-					objectAssign: 'Object.assign'
+				use: {
+					loader: 'vue-loader',
+					options: vueConfig
 				}
 			},
 			{
+				test: /\.js$/,
+				use: {
+					loader: 'buble-loader',
+					options: {
+			        	objectAssign: 'Object.assign'
+			        }
+				},
+				exclude: /node_modeles/,
+				
+			},
+			{
 				test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-				use: 'url-loader',
-				options: {
-					limit: 10000,
-					name: 'img/[name].[hash:7].[ext]'
+				use: {
+					loader: 'url-loader',
+					options: {
+						limit: 10000,
+						name: 'img/[name].[hash:7].[ext]'
+					}
 				}
 			},
 			{
                 test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                use: 'url-loader',
-				options: {
-					limit: 10000,
-					name: 'fonts/[name].[hash:7].[ext]'
-				}
+                use: {
+                	loader: 'url-loader',
+					options: {
+						limit: 10000,
+						name: 'fonts/[name].[hash:7].[ext]'
+					}
+                }
             },
 			{
                 test: /\.json/,

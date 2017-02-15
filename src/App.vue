@@ -38,11 +38,11 @@ a
 .header
     background-color #ff6600
     position fixed
-    z-index 10
+    z-index 999
     height 55px
     top 0
     left 0
-    right 0,
+    right 0
     .inner
         max-width 800px
         box-sizing border-box
@@ -83,6 +83,8 @@ a
 
 .fade-enter-active, .fade-leave-active
     transition all .2s ease
+.fade-enter, .fade-leave-active
+    opacity 0
 @media (max-width 860px)
     .header .inner
         padding 15px 30px

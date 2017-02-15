@@ -8,11 +8,11 @@ export function host (url) {
 export function timeAgo (time) {
 	const between = Date.now() / 1000 - (+time)
 	if (between < 3600) {
-		return pluralize(~~(between / 60), '·ÖÖÓ')
+		return pluralize(~~(between / 60), 'åˆ†é’Ÿ')
 	} else if (between < 86400) {
-		return pluralize(~~(between / 3600), 'Ð¡Ê±')
+		return pluralize(~~(between / 3600), 'å°æ—¶')
 	} else {
-		return pluralize(~~(between / 86400), 'Ìì')
+		return pluralize(~~(between / 86400), 'å¤©')
 	}
 }
 

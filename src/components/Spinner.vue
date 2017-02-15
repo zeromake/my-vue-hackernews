@@ -1,9 +1,9 @@
 <template>
     <transition>
-        <svg :class="{ show: show }" v-show="show" width="44px" height="44px" viewBox="0 0 44 44" class="spinner">
-            <circle fill="none" stroke-width="4" stroke-linecap="round" cx="22" cy="22" r="20" class="path"></circle>
-        </svg>
-    </transition>
+    <svg class="spinner" :class="{ show: show }" v-show="show" width="44px" height="44px" viewBox="0 0 44 44">
+      <circle class="path" fill="none" stroke-width="4" stroke-linecap="round" cx="22" cy="22" r="20"></circle>
+    </svg>
+  </transition>
 </template>
 
 <script>
@@ -20,7 +20,7 @@ $duration = 1.4s
 
 .spinner
     position fixed
-    z-index 99
+    z-index 999
     right 15px
     bottom 15px
     transition opacity .15s ease
@@ -40,9 +40,9 @@ $duration = 1.4s
 
 .spinner .path
     stroke #ff6600
-    storke-dasharray $offset
+    stroke-dasharray $offset
     stroke-dashoffset 0
-    transform-orgin center
+    transform-origin center
     animation dash $duration ease-in-out infinite
 
 @keyframes dash
@@ -53,6 +53,6 @@ $duration = 1.4s
         transform rotate(135deg)
     100%
         stroke-dashoffset $offset
-        tansform rotate(450deg)
+        transform rotate(450deg)
 
 </style>

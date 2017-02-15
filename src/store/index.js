@@ -12,10 +12,7 @@ const store = new Vuex.Store({
         users: {},
         lists: {
             top: [],
-            new: [],
-            show: [],
-            ask: [],
-            job: []
+            new: []
         }
     },
     actions: {

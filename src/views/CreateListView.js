@@ -1,4 +1,4 @@
-import ItemList from 'components/ItemList'
+import ItemList from 'components/ItemList.vue'
 
 export function createListView (type) {
 	return {

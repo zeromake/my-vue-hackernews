@@ -1,7 +1,10 @@
 import 'es6-promise/auto'
 import { app, store } from './app'
 
-store.replaceState(window.__INSTAL_STATE__)
+if (window.__INSTAL_STATE__) {
+	store.replaceState(window.__INSTAL_STATE__)
+}
+
 
 app.$mount('#app')
 

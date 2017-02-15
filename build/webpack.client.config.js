@@ -13,26 +13,28 @@ const config = Object.assign({}, base, {
 		})
 	},
 	plugins: (base.plugins || []).concat([
-		'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-		'process.env.VUE_ENV': '"client"'
-	]),
-	new webpack.optimize.CommonsChunkPlugin({
-		name: 'vendor'
-	}),
-	new HTMLPlugin({
-		template: 'src/index.template.html'
-	})
-})
-
-if (process.env.NODE_ENV === 'production'){
-	vueConfig.loaders {
-		stylus: ExtractTextPlugin.extract({
-		    loader: 'css-loader!stylus-loader',
-		    fallbackLoader: 'vue-style-loader' // <- this is a dep of vue-loader
+		new webpack.DefinePlugin({
+			'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+			'process.env.VUE_ENV': '"client"'
+		}),
+		new webpack.optimize.CommonsChunkPlugin({
+			name: 'vendor'
+		}),
+		new HTMLPlugin({
+			template: 'src/index.template.html'
 		})
-	}
+	])
+})
+if (process.env.NODE_ENV === 'production'){
+	vueConfig.loaders = {
+	    stylus: ExtractTextPlugin.extract({
+	    	loader: 'css-loader!stylus-loader',
+	    	fallbackLoader: 'vue-style-loader' // <- this is a dep of vue-loader
+	    })
+  	}
+
 	config.plugins.push(
-		new ExtractTextPlugin('style.[hash].css'),
+		new ExtractTextPlugin('styles.[hash].css'),
 		new webpack.LoaderOptionsPlugin({
 			minimize: true
 		}),
@@ -49,3 +51,4 @@ if (process.env.NODE_ENV === 'production'){
 		})
 	)
 }
+module.exports = config

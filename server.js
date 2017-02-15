@@ -16,7 +16,7 @@ const app = express()
 let indexHTML
 let renderer
 if (isProd) {
-    renderer = createRenderer(fs.fs.readFileSync(resolve('./dist/server-bundle.js'), 'utf-8'))
+    renderer = createRenderer(fs.readFileSync(resolve('./dist/server-bundle.js'), 'utf-8'))
     indexHTML = parseIndex(fs.readFileSync(resolve('./dist/index.html'), 'utf-8'))
 } else {
     require('./build/setup-dev-server')(app, {
@@ -64,7 +64,7 @@ app.get('*', (req, res) => {
     res.setHeader("Context-Type", "text/html")
     res.setHeader("Server", serverInfo)
     const s = Date.now()
-    const content = { url: req.url }
+    const context = { url: req.url }
     const renderStream = renderer.renderToStream(context)
     renderStream.once('data', () => {
         res.write(indexHTML.head)
@@ -75,8 +75,8 @@ app.get('*', (req, res) => {
     renderStream.on('end', () => {
         if (context.initialState) {
             res.write(
-                `<script>window.__INITAL_STATE__=${
-                    serialize(context.initialState,)
+                `<script>window.__INSTAL_STATE__=${
+                    serialize(context.initialState)
                 }</script>`
             )
         }
@@ -94,7 +94,7 @@ app.get('*', (req, res) => {
     })
 })
 
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 8089
 app.listen(port, () => {
   console.log(`server started at localhost:${port}`)
 })
