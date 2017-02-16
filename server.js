@@ -1,18 +1,24 @@
 const fs = require('fs')
 const path = require('path')
-const express = require('express')
-const favicon = require('serve-favicon')
-const compression = require('compression')
+//const express = require('express')
+const koa = require('koa2')
+const Router = require('koa-router')
+const serve = require('./build/serve.js')
+//const koaCompress = require('koa-compress')
+const send = require('koa-send')
+//const favicon = require('serve-favicon')
+//const compression = require('compression')
 const serialize = require('serialize-javascript')
 
 const resolve = file => path.resolve(__dirname, file)
 
 const isProd = process.env.NODE_ENV === 'production'
-const serverInfo = `express/${require('express/package.json').version}` + 
+const serverInfo = `koa/${require('koa2/package.json').version}` + 
     `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
-const app = express()
-
+	console.log(serverInfo)
+const app = new koa()
+const router = new Router()
 let indexHTML
 let renderer
 if (isProd) {
@@ -47,53 +53,65 @@ function parseIndex (template) {
     }
 }
 
-const serve = (path, cache) => express.static(resolve(path), {
+/*const serve = (path, cache) => express.static(resolve(path), {
     maxAge: cache && isProd ? 60 * 60 * 24 * 30 : 0
-})
+})*/
+app.use(serve('/service-worker.js', resolve('./dist/servivce-worker.js')))
+app.use(serve('/dist', resolve('./dist/')))
+app.use(serve('/public', resolve('./public')))
 
-app.use(compression({ threshold: 0}))
-app.use(favicon('./public/logo-48.png'))
-app.use('/service-worker.js', serve('./servivce-worker.js'))
-app.use('/dist', serve('./dist'))
-app.use('/public', serve('./public'))
-
-app.get('*', (req, res) => {
-    if (!renderer) {
-        return res.end('waiting for compilation.. refresh in a moment.')
-    }
-    res.setHeader("Context-Type", "text/html")
-    res.setHeader("Server", serverInfo)
+const renderPromise = function (ctx) {
+	const res = ctx.res
     const s = Date.now()
-    const context = { url: req.url }
+	const url = ctx.url
+    const context = { url: url }
     const renderStream = renderer.renderToStream(context)
-    renderStream.once('data', () => {
-        res.write(indexHTML.head)
-    })
-    renderStream.on('data', chunk => {
-        res.write(chunk)
-    })
-    renderStream.on('end', () => {
-        if (context.initialState) {
-            res.write(
-                `<script>window.__INSTAL_STATE__=${
-                    serialize(context.initialState)
-                }</script>`
-            )
-        }
-        res.end(indexHTML.tail)
-        console.log(`whole request: ${Date.now() - s}ms`)
-    })
-    renderStream.on('error', err => {
-        if (err && err.code === '404') {
-            res.status(404).end('404 | Page Not Found')
-            return
-        }
-        res.status(500).end('Internal Error 500')
-        console.error(`error during render : ${req.url}`)
-        console.error(err)
-    })
-})
+	return new Promise(function(resolve, reject) {
+		renderStream.once('data', () => {
+			res.statusCode = 200
+			res.write(indexHTML.head)
+		})
+		renderStream.on('data', chunk => {
+			res.write(chunk)
+		})
+		renderStream.on('end', () => {
+			if (context.initialState) {
+				res.write(
+					`<script>window.__INSTAL_STATE__=${
+						serialize(context.initialState)
+					}</script>`
+				)
+			}
+			res.end(indexHTML.tail)
+			resolve()
+			console.log(`whole request: ${Date.now() - s}ms`)
+		})
+		renderStream.on('error', err => {
+			if (err && err.code === '404') {
+				res.statusCode = 404
+				res.end('404 | Page Not Found')
+				resolve()
+				return
+			}
+			res.statusCode = 500
+			res.end('Internal Error 500')
+			resolve()
+			console.error(`error during render : ${url}`)
+			console.error(err)
+		})
+	})
+}
 
+
+router.get('*', function (cxt, next) {
+    if (!renderer) {
+        return cxt.body = 'waiting for compilation.. refresh in a moment.'
+    }
+    cxt.set("Context-Type", "text/html")
+    cxt.set("Server", serverInfo)
+    return renderPromise(cxt)
+})
+app.use(router.routes()).use(router.allowedMethods())
 const port = process.env.PORT || 8089
 app.listen(port, () => {
   console.log(`server started at localhost:${port}`)

@@ -4,7 +4,7 @@ const vueConfig = require('./vue-loader.config')
 const HTMLPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const SWPrecachePlugin = require('sw-precache-webpack-plugin')
-
+const path = require('path')
 
 const config = Object.assign({}, base, {
 	resolve: {
@@ -32,7 +32,9 @@ if (process.env.NODE_ENV === 'production'){
 	    	fallbackLoader: 'vue-style-loader' // <- this is a dep of vue-loader
 	    })
   	}
-
+	const srcDir = path.resolve(__dirname, '../').replace(/\\/g, "\/")
+	prefixMulti = {}
+	prefixMulti[srcDir] = ''
 	config.plugins.push(
 		new ExtractTextPlugin('styles.[hash].css'),
 		new webpack.LoaderOptionsPlugin({
@@ -46,6 +48,7 @@ if (process.env.NODE_ENV === 'production'){
 		new SWPrecachePlugin({
 			cacheId: 'vue-hn',
 			filename: 'service-worker.js',
+			stripPrefixMulti: prefixMulti,
 			dontCacheBustUrlsMatching: /./,
 			staticFileGlobsIgnorePatterns: [/index\.html$/, /\.map$/]
 		})
