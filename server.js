@@ -3,9 +3,8 @@ const path = require('path')
 //const express = require('express')
 const koa = require('koa2')
 const Router = require('koa-router')
-const serve = require('./build/serve.js')
+const koaStatic = require('./build/serve.js')
 //const koaCompress = require('koa-compress')
-const send = require('koa-send')
 //const favicon = require('serve-favicon')
 //const compression = require('compression')
 const serialize = require('serialize-javascript')
@@ -16,11 +15,17 @@ const isProd = process.env.NODE_ENV === 'production'
 const serverInfo = `koa/${require('koa2/package.json').version}` + 
     `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
-	console.log(serverInfo)
 const app = new koa()
 const router = new Router()
 let indexHTML
 let renderer
+
+
+const serve = (url, path, cache) => koaStatic(url, {
+	root: resolve(path),
+    maxAge: cache && isProd ? 60 * 60 * 24 * 30 : 0
+})
+
 if (isProd) {
     renderer = createRenderer(fs.readFileSync(resolve('./dist/server-bundle.js'), 'utf-8'))
     indexHTML = parseIndex(fs.readFileSync(resolve('./dist/index.html'), 'utf-8'))
@@ -53,9 +58,6 @@ function parseIndex (template) {
     }
 }
 
-/*const serve = (path, cache) => express.static(resolve(path), {
-    maxAge: cache && isProd ? 60 * 60 * 24 * 30 : 0
-})*/
 app.use(serve('/service-worker.js', resolve('./dist/servivce-worker.js')))
 app.use(serve('/dist', resolve('./dist/')))
 app.use(serve('/public', resolve('./public')))
@@ -103,13 +105,13 @@ const renderPromise = function (ctx) {
 }
 
 
-router.get('*', function (cxt, next) {
+router.get('*', function (ctx, next) {
     if (!renderer) {
-        return cxt.body = 'waiting for compilation.. refresh in a moment.'
+        return ctx.body = 'waiting for compilation.. refresh in a moment.'
     }
-    cxt.set("Context-Type", "text/html")
-    cxt.set("Server", serverInfo)
-    return renderPromise(cxt)
+    ctx.set("Context-Type", "text/html")
+    ctx.set("Server", serverInfo)
+    return renderPromise(ctx)
 })
 app.use(router.routes()).use(router.allowedMethods())
 const port = process.env.PORT || 8089

@@ -5,7 +5,7 @@ const clientConfig = require('./webpack.client.config')
 const serverConfig = require('./webpack.server.config')
 
 module.exports = function setupDevServer (app, opts) {
-    clientConfig.entry.app = ['webpack-hot-middleware/client', clientConfig.entry.app]
+    clientConfig.entry.app = ['webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000', clientConfig.entry.app]
     clientConfig.output.filename = '[name].js'
     clientConfig.plugins.push(
     	new webpack.HotModuleReplacementPlugin(),
@@ -21,7 +21,19 @@ module.exports = function setupDevServer (app, opts) {
     		chunks: false
     	}
     })
-    app.use(devMiddleware)
+    app.use(function(ctx, next) {
+        return new Promise(function(resolve, reject) {
+            devMiddleware(ctx.req, {
+                end: (content) => {
+                    ctx.body = content
+                    resolve()
+                },
+                setHeader: (name, value) => {
+                    ctx.headers[name] = value
+                }
+            }, next)
+        })
+    })
     clientCompiler.plugin('done', () => {
     	const fs = devMiddleware.fileSystem
     	const filePath = path.join(clientConfig.output.path, 'index.html')
@@ -35,7 +47,21 @@ module.exports = function setupDevServer (app, opts) {
     		}
     	})
     })
-    app.use(require('webpack-hot-middleware')(clientCompiler))
+    // app.use(hotMiddleware(clientCompiler))
+    // const PassThrough = require('stream').PassThrough
+    app.use(function(ctx, next){
+        const expressMiddleware = require('webpack-hot-middleware')(clientCompiler)
+        const res = ctx.res
+        const req = ctx.req
+        const resEnd = res.end
+        return new Promise(function(resolve, reject){
+            res.end = function() {
+                resEnd.apply(this, arguments)
+                resolve()
+            }
+            expressMiddleware(req, res, next)
+        })
+    })
 
     const serverCompiler = webpack(serverConfig)
     const mfs = new MFS()
