@@ -11,7 +11,6 @@ module.exports = function serve(path, opt) {
 			if ( pathUrl === path) {
 				if (!path.endsWith('/')){
 					const newRoot = opt.root.slice(0, -(path.length))
-					console.log('newRoot', newRoot)
 					newOpt = Object.assign({}, opt, {root: newRoot})
 					newPath = pathUrl
 				}
