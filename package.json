@@ -15,10 +15,8 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
-    "compression": "^1.6.2",
     "cross-env": "^3.1.4",
     "es6-promise": "^4.0.5",
-    "express": "^4.14.1",
     "koa-router": "7.x",
     "koa-send": "^3.3.0",
     "koa2": "^2.0.0-alpha.7",
@@ -48,6 +46,7 @@
     "vue-loader": "^10.3.0",
     "vue-template-compiler": "^2.1.10",
     "webpack": "^2.2.1",
+    "koa2-webpack-middleware-zm": "^1.0.2",
     "webpack-dev-middleware": "^1.10.0",
     "webpack-hot-middleware": "^2.16.1"
   }
