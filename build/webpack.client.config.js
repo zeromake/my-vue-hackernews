@@ -32,7 +32,10 @@ if (process.env.NODE_ENV === 'production'){
 	    	fallbackLoader: 'vue-style-loader' // <- this is a dep of vue-loader
 	    })
   	}
-
+  	// sw filter srcDir
+  	const srcDir = path.resolve(__dirname, '../').replace(/\\/g, "\/")
+	prefixMulti = {}
+	prefixMulti[srcDir] = ''
 	config.plugins.push(
 		new ExtractTextPlugin('styles.[hash].css'),
 		new webpack.LoaderOptionsPlugin({
@@ -46,6 +49,7 @@ if (process.env.NODE_ENV === 'production'){
 		new SWPrecachePlugin({
 			cacheId: 'vue-hn',
 			filename: 'service-worker.js',
+			stripPrefixMulti: prefixMulti,
 			dontCacheBustUrlsMatching: /./,
 			staticFileGlobsIgnorePatterns: [/index\.html$/, /\.map$/]
 		})
