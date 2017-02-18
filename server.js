@@ -50,13 +50,34 @@ function parseIndex (template) {
 const serve = (path, cache) => express.static(resolve(path), {
     maxAge: cache && isProd ? 60 * 60 * 24 * 30 : 0
 })
-
+// 加载和设置static
 app.use(compression({ threshold: 0}))
 app.use(favicon('./public/logo-48.png'))
 app.use('/service-worker.js', serve('./servivce-worker.js'))
 app.use('/dist', serve('./dist'))
 app.use('/public', serve('./public'))
 
+// 模拟api 
+app.use('/api/topstories.json', serve('./public/api/topstories.json'))
+app.use('/api/newstories.json', serve('./public/api/newstories.json'))
+app.get('/api/item/:id.json', (req, res, next) => {
+    const id = req.params.id
+    const time = parseInt(Math.random()*(1487396700-1400000000+1)+1400000000)
+    const item = {
+        by: "zero" + id,
+        descendants: 0,
+        id: id,
+        score: id - 13664000,
+        time: time,
+        title: `测试Item:${id} - ${time}`,
+        type: 'story',
+        url: `/api/item/${id}.json`
+
+    }
+    res.json(item)
+})
+
+// historyApiFallback and ssr
 app.get('*', (req, res) => {
     if (!renderer) {
         return res.end('waiting for compilation.. refresh in a moment.')

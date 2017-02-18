@@ -7,11 +7,8 @@
             </router-link>
             <router-link to="/top">Top</router-link>
             <router-link to="/new">New</router-link>
-            <router-link to="/show">Show</router-link>
-            <router-link to="/ask">Ask</router-link>
-            <router-link to="/job">Jobs</router-link>
-            <a class="github" href="https://github.com/vuejs/vue-hackernews-2.0" target="_blank">
-              Built with Vue.js
+            <a class="github" href="https://github.com/zeromake/my-vue-hackernews/tree/ssr-demo" target="_blank">
+              Built with zeromake
             </a>
             </nav>
         </header>

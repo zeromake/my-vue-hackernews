@@ -7,7 +7,8 @@ if (process.__API__) {
 	api = process.__API__
 } else {
 	api = {
-		url: 'https://hacker-news.firebaseio.com/v0/',
+		//url: 'https://hacker-news.firebaseio.com/v0/',
+		url: 'http://127.0.0.1:8089/api/',
 		onServer: true,
 		cachedItems: LRU({
 			max: 1000,
