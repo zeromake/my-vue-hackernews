@@ -4,7 +4,7 @@
 
 1. del /user , /item
 2. api on server.js(express)
-3. more see : [my-blog](http://blog.zeromake.com/page/vue-ssr)
+3. more see : [my-blog](http://blog.zeromake.com/pages/vue-ssr)
 
 ## Install
 ``` shell
