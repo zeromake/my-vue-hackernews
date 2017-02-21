@@ -1,7 +1,7 @@
 <template>
-    <div id="app">
-        <header class="header">
-            <nav class="inner">
+<div id="app">
+    <header class="header">
+        <nav class="inner">
             <router-link to="/" exact>
                 <img class="logo" src="~public/logo-48.png" alt="zeromake">
             </router-link>
@@ -13,12 +13,12 @@
             <a class="github" href="https://github.com/vuejs/vue-hackernews-2.0" target="_blank">
               Built with Vue.js
             </a>
-            </nav>
-        </header>
-        <transition name="fade" mode="out-in">
-            <router-view class="view"></router-view>
-        </transition>
-    </div>
+        </nav>
+    </header>
+    <transition name="fade" mode="out-in">
+        <router-view class="view"></router-view>
+    </transition>
+</div>
 </template>
 
 <style lang="stylus">
@@ -48,7 +48,7 @@ a
         box-sizing border-box
         margin 0 auto
         padding 15px 5px
-    
+
     a
         color rgba(255, 255, 255, .8)
         line-height 24px
@@ -70,7 +70,7 @@ a
         font-size .9em
         margin 0
         float right
-    
+
 .logo
     width 24px
     margin-right 10px
@@ -99,5 +99,5 @@ a
             margin-right 1em
         .github
             display none
-        
+
 </style>

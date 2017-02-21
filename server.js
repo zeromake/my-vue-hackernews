@@ -12,18 +12,18 @@ const serialize = require('serialize-javascript')
 const resolve = file => path.resolve(__dirname, file)
 
 const isProd = process.env.NODE_ENV === 'production'
-const serverInfo = `koa/${require('koa2/package.json').version}` + 
-    `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
+const serverInfo = `koa/${require('koa2/package.json').version}` + `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
 const app = new koa()
 const router = new Router()
 let indexHTML
 let renderer
 
-
 const serve = (url, path, cache) => koaStatic(url, {
-	root: resolve(path),
-    maxAge: cache && isProd ? 60 * 60 * 24 * 30 : 0
+    root: resolve(path),
+    maxAge: cache && isProd
+        ? 60 * 60 * 24 * 30
+        : 0
 })
 
 if (isProd) {
@@ -40,7 +40,7 @@ if (isProd) {
     })
 }
 
-function createRenderer (bundle) {
+function createRenderer(bundle) {
     return require('vue-server-renderer').createBundleRenderer(bundle, {
         cache: require('lru-cache')({
             max: 1000,
@@ -49,7 +49,7 @@ function createRenderer (bundle) {
     })
 }
 
-function parseIndex (template) {
+function parseIndex(template) {
     const contentMarker = '<!-- APP -->'
     const i = template.indexOf(contentMarker)
     return {
@@ -62,50 +62,47 @@ app.use(serve('/service-worker.js', resolve('./dist/servivce-worker.js')))
 app.use(serve('/dist', resolve('./dist/')))
 app.use(serve('/public', resolve('./public')))
 
-const renderPromise = function (ctx) {
-	const res = ctx.res
+const renderPromise = function(ctx) {
+    const res = ctx.res
     const s = Date.now()
-	const url = ctx.url
-    const context = { url: url }
+    const url = ctx.url
+    const context = {
+        url: url
+    }
     const renderStream = renderer.renderToStream(context)
-	return new Promise(function(resolve, reject) {
-		renderStream.once('data', () => {
-			res.statusCode = 200
-			res.write(indexHTML.head)
-		})
-		renderStream.on('data', chunk => {
-			res.write(chunk)
-		})
-		renderStream.on('end', () => {
-			if (context.initialState) {
-				res.write(
-					`<script>window.__INSTAL_STATE__=${
-						serialize(context.initialState)
-					}</script>`
-				)
-			}
-			res.end(indexHTML.tail)
-			resolve()
-			console.log(`whole request: ${Date.now() - s}ms`)
-		})
-		renderStream.on('error', err => {
-			if (err && err.code === '404') {
-				res.statusCode = 404
-				res.end('404 | Page Not Found')
-				resolve()
-				return
-			}
-			res.statusCode = 500
-			res.end('Internal Error 500')
-			resolve()
-			console.error(`error during render : ${url}`)
-			console.error(err)
-		})
-	})
+    return new Promise(function(resolve, reject) {
+        renderStream.once('data', () => {
+            res.statusCode = 200
+            res.write(indexHTML.head)
+        })
+        renderStream.on('data', chunk => {
+            res.write(chunk)
+        })
+        renderStream.on('end', () => {
+            if (context.initialState) {
+                res.write(`<script>window.__INSTAL_STATE__=${serialize(context.initialState)}</script>`)
+            }
+            res.end(indexHTML.tail)
+            resolve()
+            console.log(`whole request: ${Date.now() - s}ms`)
+        })
+        renderStream.on('error', err => {
+            if (err && err.code === '404') {
+                res.statusCode = 404
+                res.end('404 | Page Not Found')
+                resolve()
+                return
+            }
+            res.statusCode = 500
+            res.end('Internal Error 500')
+            resolve()
+            console.error(`error during render : ${url}`)
+            console.error(err)
+        })
+    })
 }
 
-
-router.get('*', function (ctx, next) {
+router.get('*', function(ctx, next) {
     if (!renderer) {
         return ctx.body = 'waiting for compilation.. refresh in a moment.'
     }
@@ -116,5 +113,5 @@ router.get('*', function (ctx, next) {
 app.use(router.routes()).use(router.allowedMethods())
 const port = process.env.PORT || 8089
 app.listen(port, () => {
-  console.log(`server started at localhost:${port}`)
+    console.log(`server started at localhost:${port}`)
 })

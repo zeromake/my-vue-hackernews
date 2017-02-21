@@ -86,7 +86,7 @@ export default {
                     return
                 }
                 this.transition = from === -1 ? null : to > from ? 'slide-left' : 'slide-right'
-                this.displayedPage = to 
+                this.displayedPage = to
                 this.displayedItems = this.$store.getters.activeItems
                 this.loading = false
             })
