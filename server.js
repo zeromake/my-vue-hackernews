@@ -1,12 +1,8 @@
 const fs = require('fs')
 const path = require('path')
-//const express = require('express')
 const koa = require('koa2')
 const Router = require('koa-router')
 const koaStatic = require('./build/serve.js')
-//const koaCompress = require('koa-compress')
-//const favicon = require('serve-favicon')
-//const compression = require('compression')
 const serialize = require('serialize-javascript')
 
 const resolve = file => path.resolve(__dirname, file)
