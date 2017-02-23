@@ -4,6 +4,7 @@ const vueConfig = require('./vue-loader.config')
 const HTMLPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const SWPrecachePlugin = require('sw-precache-webpack-plugin')
+const path = require('path')
 
 
 const config = Object.assign({}, base, {

@@ -1,17 +1,18 @@
 const fs = require('fs')
 const path = require('path')
-const express = require('express')
-const favicon = require('serve-favicon')
-const compression = require('compression')
+const Koa = require('koa2')
+const KoaRuoter = require('koa-router')
+const KoaServe = require('./build/serve')
 const serialize = require('serialize-javascript')
 
 const resolve = file => path.resolve(__dirname, file)
 
 const isProd = process.env.NODE_ENV === 'production'
-const serverInfo = `express/${require('express/package.json').version}` + 
+const serverInfo = `koa2/${require('koa2/package.json').version}` +
     `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
-const app = express()
+const app = new Koa()
+const router = new KoaRuoter()
 
 let indexHTML
 let renderer
@@ -47,21 +48,22 @@ function parseIndex (template) {
     }
 }
 
-const serve = (path, cache) => express.static(resolve(path), {
+const serve = (url, path, cache) => KoaServe(url, {
+    root: resolve(path),
     maxAge: cache && isProd ? 60 * 60 * 24 * 30 : 0
 })
 // 加载和设置static
-app.use(compression({ threshold: 0}))
-app.use(favicon('./public/logo-48.png'))
-app.use('/service-worker.js', serve('./servivce-worker.js'))
-app.use('/dist', serve('./dist'))
-app.use('/public', serve('./public'))
+//app.use(compression({ threshold: 0}))
+//app.use(favicon('./public/logo-48.png'))
+app.use(serve('/service-worker.js', './dist/servivce-worker.js'))
+app.use(serve('/dist', './dist'))
+app.use(serve('/public', './public'))
 
-// 模拟api 
-app.use('/api/topstories.json', serve('./public/api/topstories.json'))
-app.use('/api/newstories.json', serve('./public/api/newstories.json'))
-app.get('/api/item/:id.json', (req, res, next) => {
-    const id = req.params.id
+// 模拟api
+app.use(serve('/api/topstories.json', './public/api/topstories.json'))
+app.use(serve('/api/newstories.json', './public/api/newstories.json'))
+router.get('/api/item/:id.json', (ctx, next) => {
+    const id = ctx.params.id
     const time = parseInt(Math.random()*(1487396700-1400000000+1)+1400000000)
     const item = {
         by: "zero" + id,
@@ -74,46 +76,56 @@ app.get('/api/item/:id.json', (req, res, next) => {
         url: `/api/item/${id}.json`
 
     }
-    res.json(item)
+    ctx.body = item
 })
 
 // historyApiFallback and ssr
-app.get('*', (req, res) => {
+router.get('*', (ctx, next) => {
     if (!renderer) {
-        return res.end('waiting for compilation.. refresh in a moment.')
+        return ctx.body ='waiting for compilation.. refresh in a moment.'
     }
-    res.setHeader("Context-Type", "text/html")
-    res.setHeader("Server", serverInfo)
+    ctx.set("Context-Type", "text/html")
+    ctx.set("Server", serverInfo)
     const s = Date.now()
-    const context = { url: req.url }
+    const context = { url: ctx.url }
     const renderStream = renderer.renderToStream(context)
-    renderStream.once('data', () => {
-        res.write(indexHTML.head)
-    })
-    renderStream.on('data', chunk => {
-        res.write(chunk)
-    })
-    renderStream.on('end', () => {
-        if (context.initialState) {
-            res.write(
-                `<script>window.__INSTAL_STATE__=${
-                    serialize(context.initialState)
-                }</script>`
-            )
-        }
-        res.end(indexHTML.tail)
-        console.log(`whole request: ${Date.now() - s}ms`)
-    })
-    renderStream.on('error', err => {
-        if (err && err.code === '404') {
-            res.status(404).end('404 | Page Not Found')
-            return
-        }
-        res.status(500).end('Internal Error 500')
-        console.error(`error during render : ${req.url}`)
-        console.error(err)
+    const res = ctx.res
+    return new Promise(function(resolve){
+        renderStream.once('data', () => {
+            res.statusCode = 200
+            res.write(indexHTML.head)
+        })
+        renderStream.on('data', chunk => {
+            res.write(chunk)
+        })
+        renderStream.on('end', () => {
+            if (context.initialState) {
+                res.write(
+                    `<script>window.__INSTAL_STATE__=${
+                        serialize(context.initialState)
+                    }</script>`
+                )
+            }
+            res.end(indexHTML.tail)
+            resolve()
+            console.log(`whole request: ${Date.now() - s}ms`)
+        })
+        renderStream.on('error', err => {
+            if (err && err.code === '404') {
+                res.statusCode = 404
+                res.end('404 | Page Not Found')
+                resolve()
+                return
+            }
+            res.statusCode = 500
+            res.end('Internal Error 500')
+            resolve()
+            console.error(`error during render : ${ctx.url}`)
+            console.error(err)
+        })
     })
 })
+app.use(router.routes()).use(router.allowedMethods())
 
 const port = process.env.PORT || 8089
 app.listen(port, () => {
