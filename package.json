@@ -20,6 +20,7 @@
     "koa-router": "7.x",
     "koa-send": "^3.3.0",
     "koa2": "^2.0.0-alpha.7",
+    "koa2-webpack-middleware-zm": "^1.0.2",
     "lru-cache": "^4.0.2",
     "serialize-javascript": "^1.3.0",
     "vue": "^2.1.10",

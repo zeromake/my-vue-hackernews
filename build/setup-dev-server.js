@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const MFS = require('memory-fs')
 const clientConfig = require('./webpack.client.config')
 const serverConfig = require('./webpack.server.config')
+const { koaDevMiddleware, koaHotMiddleware } = require('koa2-webpack-middleware-zm')
 
 module.exports = function setupDevServer (app, opts) {
     clientConfig.entry.app = ['webpack-hot-middleware/client', clientConfig.entry.app]
@@ -21,7 +22,7 @@ module.exports = function setupDevServer (app, opts) {
             chunks: false
         }
     })
-    app.use(devMiddleware)
+    app.use(koaDevMiddleware(devMiddleware))
     clientCompiler.plugin('done', () => {
         const fs = devMiddleware.fileSystem
         const filePath = path.join(clientConfig.output.path, 'index.html')
@@ -35,7 +36,8 @@ module.exports = function setupDevServer (app, opts) {
             }
         })
     })
-    app.use(require('webpack-hot-middleware')(clientCompiler))
+    const expressHotMiddleware = require('webpack-hot-middleware')(clientCompiler)
+    app.use(koaHotMiddleware(expressHotMiddleware))
 
     const serverCompiler = webpack(serverConfig)
     const mfs = new MFS()
