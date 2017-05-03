@@ -1,18 +1,13 @@
 const path = require('path')
+const webpack = require('webpack')
 const vueConfig = require('./vue-loader.config')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+
+const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = {
-    devtool: '#source-map',
-    entry: {
-        app: './src/client-entry.js',
-        vendor: [
-            'es6-promise',
-            'vue',
-            'vue-router',
-            'vuex',
-            'vuex-router-sync'
-        ]
-    },
+    devtool: isProd ? false : '#cheap-module-source-map',
     output: {
         path: path.resolve(__dirname, '../dist'),
         publicPath: '/dist/',
@@ -67,9 +62,32 @@ module.exports = {
                 }
             },
             {
+                test: /\.css$/,
+                use: isProd ? ExtractTextPlugin.extract({
+                    use: 'css-loader?minimize',
+                    fallback: 'vue-style-loader'
+                }) : ['vue-style-loader', 'css-loader']
+            },
+            {
                 test: /\.json/,
                 use: 'json-loader'
             }
         ]
-    }
+    },
+    performance: {
+        maxEntrypointSize: 300000,
+        hints: isProd ? 'warning' : false
+    },
+    plugins: isProd 
+        ? [
+            new webpack.optimize.UglifyJsPlugin({
+                compress: { warnings: false }
+            }),
+            new ExtractTextPlugin({
+                filename: 'common.[chunkhash].css'
+            })
+        ]
+        : [
+            new FriendlyErrorsPlugin()
+        ]
 }

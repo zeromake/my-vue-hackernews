@@ -17,5 +17,8 @@ export function timeAgo (time) {
 }
 
 function pluralize (time, label) {
-    return time + label
+    if (time === 1) {
+        return time + label
+    }
+    return time + label + 's'
 }

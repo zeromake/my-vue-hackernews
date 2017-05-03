@@ -1,8 +1,16 @@
-import api from 'create-api'
+import { createAPI } from 'create-api'
 import Axios from 'axios'
 
-if (api.onServer && !api.warmCacheStarted) {
-    api.warmCacheStarted = true
+const logRequests = !!process.env.DEBUG_API
+
+const api = createAPI({
+    version: '/v0',
+    config: {
+        url: 'http://127.0.0.1:8089'
+    }
+})
+
+if (api.onServer) {
     warmCache()
 }
 
@@ -12,8 +20,10 @@ function warmCache () {
 }
 
 function fetch (child) {
+    logRequests && console.log(`fetching ${child}...`)
     const cache = api.cachedItems
     if (cache && cache.has(child)) {
+        logRequests && console.log(`cache hit for ${child}.`)
         return Promise.resolve(cache.get(child))
     } else {
         return new Promise((resolve, reject) => {
@@ -21,6 +31,7 @@ function fetch (child) {
                 const val = res.data
                 if (val) val.__lastUpdate = Date.now()
                 cache && cache.set(child, val)
+                logRequests && console.log(`fetched ${child}.`)
                 resolve(val)
             }).catch(reject)
         })

@@ -3,14 +3,17 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-import { createListView } from '../views/CreateListView'
+const createListView = id => () => System.import('../views/CreateListView').then(m => m.default(id))
+// import { createListView } from '../views/CreateListView'
 
-export default new Router({
-    mode: 'history',
-    scrollBehavior: () => ({ y: 0 }),
-    routes: [
-        { path: '/top/:page(\\d+)?', component: createListView('top') },
-        { path: '/new/:page(\\d+)?', component: createListView('new') },
-        { path: '/', redirect: '/top' }
-    ]
-})
+export function createRouter () {
+    return new Router({
+        mode: 'history',
+        scrollBehavior: () => ({ y: 0 }),
+        routes: [
+            { path: '/top/:page(\\d+)?', component: createListView('top') },
+            { path: '/new/:page(\\d+)?', component: createListView('new') },
+            { path: '/', redirect: '/top' }
+        ]
+    })
+}

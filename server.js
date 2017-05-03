@@ -4,16 +4,50 @@ const Koa = require('koa')
 const KoaRuoter = require('koa-router')
 const KoaServe = require('./build/serve')
 const serialize = require('serialize-javascript')
+const { createBundleRenderer } = require('vue-server-renderer')
+const LRU = require('lru-cache')
 
 const resolve = file => path.resolve(__dirname, file)
 
 const isProd = process.env.NODE_ENV === 'production'
+const useMicroCache = process.env.MICRO_CACHE !== 'false'
+
 const serverInfo = `koa/${require('koa/package.json').version}` +
     `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
 const app = new Koa()
 const router = new KoaRuoter()
 
+const template = fs.readFileSync(resolve('./src/index.template.html'), 'utf-8')
+
+function createRenderer (bundle, options) {
+    return createBundleRenderer(
+        bundle,
+        Object.assign(options, {
+            template,
+            cache: LRU({
+                max: 1000,
+                maxAge: 1000 * 60 * 15
+            }),
+            basedir: resolve('./dist'),
+            runInNewContext: false
+        })
+    )
+}
+
+let renderer
+let readyPromise
+if (isProd) {
+    const bundle = require('./dist/vue-ssr-server-bundle.json')
+    const clientManifest = require('./dist/vue-ssr-client-manifest.json')
+    renderer = createRenderer(bundle, {
+        clientManifest
+    })
+} else {
+    readyPromise = require('./build/setup-dev-server')(app, (bundle, options) => {
+        renderer = createRenderer(bundle, options)
+    })
+}
 
 const serve = (url, path, cache) => KoaServe(url, {
     root: resolve(path),
@@ -40,93 +74,72 @@ router.get('/api/item/:id.json', (ctx, next) => {
     ctx.body = item
 })
 
-let indexHTML
-let renderer
-if (isProd) {
-    renderer = createRenderer(fs.readFileSync(resolve('./dist/server-bundle.js'), 'utf-8'))
-    indexHTML = parseIndex(fs.readFileSync(resolve('./dist/index.html'), 'utf-8'))
-} else {
-    require('./build/setup-dev-server')(app, {
-        bundleUpdated: bundle => {
-            renderer = createRenderer(bundle)
-        },
-        indexUpdated: index => {
-            indexHTML = parseIndex(index)
-        }
-    })
-}
-
-function createRenderer (bundle) {
-    return require('vue-server-renderer').createBundleRenderer(bundle, {
-        cache: require('lru-cache')({
-            max: 1000,
-            maxAge: 1000 * 60 * 15
-        })
-    })
-}
-
-function parseIndex (template) {
-    const contentMarker = '<!-- APP -->'
-    const i = template.indexOf(contentMarker)
-    return {
-        head: template.slice(0, i),
-        tail: template.slice(i + contentMarker.length)
-    }
-}
-
 // 加载和设置static
 // app.use(compression({ threshold: 0}))
 // app.use(favicon('./public/logo-48.png'))
+app.use(serve('/dist', './dist', true))
+app.use(serve('/public', './public', true))
+app.use(serve('/manifest.json','./manifest.json', true))
 app.use(serve('/service-worker.js', './dist/servivce-worker.js'))
-app.use(serve('/dist', './dist'))
-app.use(serve('/public', './public'))
 
-
-// historyApiFallback and ssr
-router.get('*', (ctx, next) => {
-    if (!renderer) {
-        return ctx.body ='waiting for compilation.. refresh in a moment.'
-    }
-    ctx.set('Content-Type', 'text/html')
-    ctx.set('Server', serverInfo)
-    const s = Date.now()
-    const context = { url: ctx.url }
-    const renderStream = renderer.renderToStream(context)
-    const res = ctx.res
-    return new Promise(function (resolve) {
-        renderStream.once('data', () => {
-            res.statusCode = 200
-            res.write(indexHTML.head)
-        })
-        renderStream.on('data', chunk => {
-            res.write(chunk)
-        })
-        renderStream.on('end', () => {
-            if (context.initialState) {
-                res.write(
-                    `<script>window.__INSTAL_STATE__=${
-                        serialize(context.initialState)
-                    }</script>`
-                )
+// 1-second microcache.
+const microCache = LRU({
+    max: 100,
+    maxAge: 1000
+})
+// 根据请求信息判断是否微缓存
+const isCacheable = ctx => useMicroCache
+function render (ctx, next) {
+    ctx.set("Content-Type", "text/html")
+    ctx.set("Server", serverInfo)
+    return new Promise (function (resolve, reject) {
+        const s = Date.now()
+        const handleError = err => {
+            if (err && err.code === 404) {
+                ctx.status = 404
+                ctx.body = '404 | Page Not Found'
+            } else {
+                ctx.status = 500
+                ctx.body = '500 | Internal Server Error'
+                console.error(`error during render : ${ctx.url}`)
+                console.error(err.stack)
             }
-            res.end(indexHTML.tail)
             resolve()
-            console.log(`whole request: ${Date.now() - s}ms`)
-        })
-        renderStream.on('error', err => {
-            if (err && err.code === '404') {
-                res.statusCode = 404
-                res.end('404 | Page Not Found')
+        }
+        const cacheable = isCacheable(ctx)
+        if (cacheable) {
+            const hit = microCache.get(ctx.url)
+            if (hit) {
+                if (!isProd) {
+                    console.log('cache hit!')
+                }
+                ctx.body = hit
                 resolve()
                 return
             }
-            res.statusCode = 500
-            res.end('Internal Error 500')
+        }
+        const context = {
+            title: 'Vue Ssr 2.3',
+            url: ctx.url
+        }
+        renderer.renderToString(context, (err, html) => {
+            if (err) {
+                return handleError(err)
+            }
+            ctx.body = html
             resolve()
-            console.error(`error during render : ${ctx.url}`)
-            console.error(err)
+            if (cacheable) {
+                microCache.set(ctx.url, html)
+            }
+            if (!isProd) {
+                console.log(`whole request: ${Date.now() - s}ms`)
+            }
         })
     })
+}
+// historyApiFallback and ssr
+router.get('*', isProd ? render: (ctx, next) => {
+    return readyPromise.then(() => render(ctx, next))
 })
 app.use(router.routes()).use(router.allowedMethods())
 

@@ -1,19 +1,26 @@
 import Vue from 'vue'
 import App from './App.vue'
-import store from './store'
-import router from './router'
+import { createStore } from './store'
+import { createRouter } from './router'
 import { sync } from 'vuex-router-sync'
-import * as filters from './filters'
+import titleMixin from './util/title'
+import * as filters from './util/filters'
 
-sync(store, router)
+Vue.mixin(titleMixin)
 
 Object.keys(filters).forEach(key => {
     Vue.filter(key, filters[key])
 })
 
-const app = new Vue({
-    router,
-    store,
-    render: h => h(App)
-})
-export { app, router, store }
+export function createApp () {
+    const store = createStore()
+    const router = createRouter()
+
+    sync(store, router)
+    const app = new Vue({
+        router,
+        store,
+        render: h => h(App)
+    })
+    return { app, router, store }
+}

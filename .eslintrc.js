@@ -13,7 +13,7 @@ module.exports = {
         mocha: true
     },
     "rules": {
-        "no-console": 1,
+        "no-console": 0,
         "no-alert": 1,
         "indent": ["warn", 4]
     }

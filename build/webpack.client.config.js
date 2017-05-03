@@ -1,54 +1,47 @@
-const webpack = require('webpack')
-const base = require('./webpack.base.config')
-const vueConfig = require('./vue-loader.config')
-const HTMLPlugin = require('html-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const SWPrecachePlugin = require('sw-precache-webpack-plugin')
 const path = require('path')
+const webpack = require('webpack')
+const merge = require('webpack-merge')
+const base = require('./webpack.base.config')
+const SWPrecachePlugin = require('sw-precache-webpack-plugin')
+const VueSSRClientPlugin = require('vue-server-renderer/client-plugin')
 
 
-const config = Object.assign({}, base, {
-    resolve: {
-        alias: Object.assign({}, base.resolve.alias, {
-            'create-api': './create-api-client.js'
-        })
+const config = merge(base, {
+    entry: {
+        app: './src/client-entry.js'
     },
-    plugins: (base.plugins || []).concat([
+    resolve: {
+        alias: {
+            'create-api': './create-api-client.js'
+        }
+    },
+    plugins: [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
             'process.env.VUE_ENV': '"client"'
         }),
         new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor'
-        }),
-        new HTMLPlugin({
-            template: 'src/index.template.html'
-        })
-    ])
-})
-if (process.env.NODE_ENV === 'production'){
-    vueConfig.loaders = {
-        stylus: ExtractTextPlugin.extract({
-            loader: 'css-loader!stylus-loader',
-            fallbackLoader: 'vue-style-loader' // <- this is a dep of vue-loader
-        })
-    }
-    // sw filter srcDir
-    const srcDir = path.resolve(__dirname, '../').replace(/\\/g, "\/")
-    prefixMulti = {}
-    prefixMulti[srcDir] = ''
-    config.plugins.push(
-        new ExtractTextPlugin('styles.[hash].css'),
-        new webpack.LoaderOptionsPlugin({
-            minimize: true
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
+            name: 'vendor',
+            minChunks: function (module) {
+                return (
+                    /node_modules/.test(module.context) && !/\.css$/.test(module.require)
+                )
             }
         }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'manifest'
+        }),
+        new VueSSRClientPlugin()
+    ]
+})
+if (process.env.NODE_ENV === 'production'){
+    const srcDir = path.resolve(__dirname, '../').replace(/\\/g, "\/")
+    prefixMulti = {
+        [srcDir]: ''
+    }
+    config.plugins.push(
         new SWPrecachePlugin({
-            cacheId: 'vue-hn',
+            cacheId: 'vue-ssr',
             filename: 'service-worker.js',
             stripPrefixMulti: prefixMulti,
             dontCacheBustUrlsMatching: /./,

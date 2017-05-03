@@ -1,6 +1,5 @@
 <template>
 <div class="news-view">
-    <spinner :show="loading"></spinner>
     <div class="news-list-nav">
         <router-link v-if="page > 1" :to="'/' + type + '/' + (page - 1)">&lt; prev</router-link>
         <a v-else class="disabled">&lt; prev</a>
@@ -20,16 +19,12 @@
 </template>
 
 <script>
-import Spinner from './Spinner.vue'
 import Item from './Item.vue'
-import { watchList } from '../store/api'
-
-let isInitialRender = true
+import { watchList } from '../api'
 
 export default {
     name: 'item-list',
     components: {
-        Spinner,
         Item
     },
     props: {
@@ -37,12 +32,10 @@ export default {
     },
     data () {
         const data = {
-            loading: false,
-            transition: 'slide-up',
-            displayedPage: isInitialRender ? (+this.$store.state.route.params.page) || 1 : -1,
-            displayedItems: isInitialRender ? this.$store.getters.activeItems : []
+            transition: 'slide-right',
+            displayedPage: Number(+this.$store.state.route.params.page) || 1,
+            displayedItems: this.$store.getters.activeItems
         }
-        isInitialRender = false
         return data
     },
     computed: {
@@ -78,7 +71,7 @@ export default {
     },
     methods: {
         loadItems (to = this.page, from = -1) {
-            this.loading = true
+            this.$bar.start()
             this.$store.dispatch('FETCH_LIST_DATA', {
                 type: this.type
             }).then(() => {
@@ -89,7 +82,7 @@ export default {
                 this.transition = from === -1 ? null : to > from ? 'slide-left' : 'slide-right'
                 this.displayedPage = to
                 this.displayedItems = this.$store.getters.activeItems
-                this.loading = false
+                this.$bar.finish()
             })
         },
         test () {
@@ -133,7 +126,7 @@ export default {
     transform translate(30px, 0)
 
 .slide-left-leave-active, .slide-right-enter
-    opacity: 0
+    opacity 0
     transform translate(-30px, 0)
 
 .item-move, .item-enter-active, .item-leave-active
