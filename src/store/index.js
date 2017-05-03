@@ -22,7 +22,7 @@ const store = new Vuex.Store({
                 .then(ids => commit('SET_LIST', { type, ids }))
                 .then(() => dispatch('ENSURE_ACTIVE_ITEMS'))
         },
-        ENSURE_ACTIVE_ITEMS: ({ dispatch, getters}) => {
+        ENSURE_ACTIVE_ITEMS: ({ dispatch, getters }) => {
             return dispatch('FETCH_ITEMS', {
                 ids: getters.activeIds
             })
@@ -48,7 +48,7 @@ const store = new Vuex.Store({
         FETCH_USER: ({ commit, state }, { id }) => {
             return state.users[id]
                 ? Promise.resolve(state.users[id])
-                : fetchUser(id).then(user => commit('SET_USER', {user}))
+                : fetchUser(id).then(user => commit('SET_USER', { user }))
         }
     },
     mutations: {
@@ -65,7 +65,7 @@ const store = new Vuex.Store({
                 }
             })
         },
-        SET_USER: (state, {user}) => {
+        SET_USER: (state, { user }) => {
             Vue.set(state.users, user.id, user)
         }
     },

@@ -28,12 +28,12 @@
 </template>
 
 <script>
-import {timeAgo} from '../filters'
+import { timeAgo } from '../filters'
 
 export default {
     name: 'news-item',
     props: ['item'],
-    serverCacheKey: ({item: { id, __lastUpdated, time }}) => {
+    serverCacheKey: ({ item: { id, __lastUpdated, time }}) => {
         return `${id}::${__lastUpdated}::${timeAgo(time)}`
     }
 }
@@ -41,7 +41,7 @@ export default {
 
 <style lang="stylus">
 .news-item
-    background-color: #fff
+    background-color #fff
     padding 20px 30px 20px 80px
     border-bottom 1px solid #eee
     position relative

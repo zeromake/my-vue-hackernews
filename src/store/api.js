@@ -11,7 +11,6 @@ function warmCache () {
     setTimeout(warmCache, 1000 * 60 * 15)
 }
 
-
 function fetch (child) {
     const cache = api.cachedItems
     if (cache && cache.has(child)) {
@@ -55,20 +54,20 @@ export function watchList (type, cb) {
     const handler = res => {
         cb(res.data)
     }
-    function watchTimeout() {
+    function watchTimeout () {
         if (first) {
             first = false
         } else {
             Axios.get(`${api.url}${type}stories.json`).then(handler)
         }
-        if (isOn){
+        if (isOn) {
             timeoutId = setTimeout(watchTimeout, 1000 * 60 * 15)
         }
     }
     watchTimeout()
     return () => {
         isOn = false
-        if (timeoutId){
+        if (timeoutId) {
             clearTimeout(timeoutId)
         }
     }

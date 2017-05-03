@@ -39,8 +39,8 @@ export default {
         const data = {
             loading: false,
             transition: 'slide-up',
-            displayedPage: isInitialRender ? (+this.$store.state.route.params.page) || 1: -1,
-            displayedItems: isInitialRender ? this.$store.getters.activeItems: []
+            displayedPage: isInitialRender ? (+this.$store.state.route.params.page) || 1 : -1,
+            displayedItems: isInitialRender ? this.$store.getters.activeItems : []
         }
         isInitialRender = false
         return data
@@ -77,7 +77,7 @@ export default {
         }
     },
     methods: {
-        loadItems (to=this.page, from=-1) {
+        loadItems (to = this.page, from = -1) {
             this.loading = true
             this.$store.dispatch('FETCH_LIST_DATA', {
                 type: this.type
@@ -87,12 +87,12 @@ export default {
                     return
                 }
                 this.transition = from === -1 ? null : to > from ? 'slide-left' : 'slide-right'
-                this.displayedPage = to 
+                this.displayedPage = to
                 this.displayedItems = this.$store.getters.activeItems
                 this.loading = false
             })
         },
-        test() {
+        test () {
             this.loading = !this.loading
         }
     }

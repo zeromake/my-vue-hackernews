@@ -29,6 +29,12 @@ module.exports = {
         noParse: /es6-promise\.js$/,
         rules: [
             {
+                test: /\.(js|vue)/,
+                use: 'eslint-loader',
+                enforce: 'pre',
+                exclude: /node_modules/
+            },
+            {
                 test: /\.vue$/,
                 use: {
                     loader: 'vue-loader',
@@ -37,14 +43,8 @@ module.exports = {
             },
             {
                 test: /\.js$/,
-                use: {
-                    loader: 'buble-loader',
-                    options: {
-                        objectAssign: 'Object.assign'
-                    }
-                },
-                exclude: /node_modeles/,
-                
+                use: 'babel-loader',
+                exclude: /node_modules/
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

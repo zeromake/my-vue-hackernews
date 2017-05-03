@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const Koa = require('koa2')
+const Koa = require('koa')
 const KoaRuoter = require('koa-router')
 const KoaServe = require('./build/serve')
 const serialize = require('serialize-javascript')
@@ -8,13 +8,11 @@ const serialize = require('serialize-javascript')
 const resolve = file => path.resolve(__dirname, file)
 
 const isProd = process.env.NODE_ENV === 'production'
-const serverInfo = `koa2/${require('koa2/package.json').version}` +
+const serverInfo = `koa/${require('koa/package.json').version}` +
     `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
 const app = new Koa()
 const router = new KoaRuoter()
-
-const api_router = new KoaRuoter()
 
 
 const serve = (url, path, cache) => KoaServe(url, {
@@ -25,11 +23,11 @@ const serve = (url, path, cache) => KoaServe(url, {
 // 模拟api
 app.use(serve('/api/topstories.json', './public/api/topstories.json'))
 app.use(serve('/api/newstories.json', './public/api/newstories.json'))
-api_router.get('/api/item/:id.json', (ctx, next) => {
+router.get('/api/item/:id.json', (ctx, next) => {
     const id = ctx.params.id
-    const time = parseInt(Math.random()*(1487396700-1400000000+1)+1400000000)
+    const time = parseInt(Math.random() * (1487396700 - 1400000000 + 1) + 1400000000)
     const item = {
-        by: "zero" + id,
+        by: 'zero' + id,
         descendants: 0,
         id: id,
         score: id - 13664000,
@@ -41,7 +39,6 @@ api_router.get('/api/item/:id.json', (ctx, next) => {
     }
     ctx.body = item
 })
-app.use(api_router.routes()).use(api_router.allowedMethods())
 
 let indexHTML
 let renderer
@@ -78,8 +75,8 @@ function parseIndex (template) {
 }
 
 // 加载和设置static
-//app.use(compression({ threshold: 0}))
-//app.use(favicon('./public/logo-48.png'))
+// app.use(compression({ threshold: 0}))
+// app.use(favicon('./public/logo-48.png'))
 app.use(serve('/service-worker.js', './dist/servivce-worker.js'))
 app.use(serve('/dist', './dist'))
 app.use(serve('/public', './public'))
@@ -90,13 +87,13 @@ router.get('*', (ctx, next) => {
     if (!renderer) {
         return ctx.body ='waiting for compilation.. refresh in a moment.'
     }
-    ctx.set("Content-Type", "text/html")
-    ctx.set("Server", serverInfo)
+    ctx.set('Content-Type', 'text/html')
+    ctx.set('Server', serverInfo)
     const s = Date.now()
     const context = { url: ctx.url }
     const renderStream = renderer.renderToStream(context)
     const res = ctx.res
-    return new Promise(function(resolve){
+    return new Promise(function (resolve) {
         renderStream.once('data', () => {
             res.statusCode = 200
             res.write(indexHTML.head)
