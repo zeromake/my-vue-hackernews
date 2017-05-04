@@ -36,9 +36,9 @@ module.exports = function setupDevServer (app, cb) {
     clientCompiler.plugin('done', (stats) => {
         const fs = devMiddleware.fileSystem
         console.log('!>watch')
-        // if (stats && stats.compilation && (stats.compilation.errors || stats.compilation.warnings) && (stats.compilation.errors.length > 0 || stats.compilation.warnings.length > 0)) {
-        //     console.log(require('format-webpack-stats-errors-warnings')(stats, path.resolve(__dirname, '../')))
-        // }
+        if (stats && stats.compilation && (stats.compilation.errors || stats.compilation.warnings) && (stats.compilation.errors.length > 0 || stats.compilation.warnings.length > 0)) {
+            console.log(require('format-webpack-stats-errors-warnings')(stats, path.resolve(__dirname, '../')))
+        }
         console.log('!>compiler')
         const readFile = file => fs.readFileSync(path.join(clientConfig.output.path, file), 'utf-8')
         clientManifest = JSON.parse(readFile('vue-ssr-client-manifest.json'))

@@ -88,7 +88,7 @@
     rigth 0px
     height 2px
     width 0%
-    transition width 0.2s opacity 0.4s
+    transition width 0.2s, opacity 0.4s
     opacity 1
     background-color #efc14e
     z-index 999999

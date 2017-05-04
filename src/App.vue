@@ -7,7 +7,7 @@
             </router-link>
             <router-link to="/top">Top</router-link>
             <router-link to="/new">New</router-link>
-            <a class="github" href="https://github.com/zeromake/my-vue-hackernews/tree/ssr-demo" target="_blank">
+            <a class="github" href="https://github.com/zeromake/my-vue-hackernews" target="_blank" rel="noopener">
               Built with zeromake
             </a>
             </nav>

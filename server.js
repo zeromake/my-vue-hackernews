@@ -12,7 +12,7 @@ const resolve = file => path.resolve(__dirname, file)
 const isProd = process.env.NODE_ENV === 'production'
 const useMicroCache = process.env.MICRO_CACHE !== 'false'
 
-const serverInfo = `koa/${require('koa/package.json').version}` +
+const serverInfo = `koa/${require('koa/package.json').version}|` +
     `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
 const app = new Koa()
@@ -79,13 +79,13 @@ router.get('/api/item/:id.json', (ctx, next) => {
 // app.use(favicon('./public/logo-48.png'))
 app.use(serve('/dist', './dist', true))
 app.use(serve('/public', './public', true))
-app.use(serve('/manifest.json','./manifest.json', true))
+// app.use(serve('/manifest.json','./manifest.json', true))
 app.use(serve('/service-worker.js', './dist/servivce-worker.js'))
 
 // 1-second microcache.
 const microCache = LRU({
     max: 100,
-    maxAge: 1000
+    maxAge: 10000000
 })
 // 根据请求信息判断是否微缓存
 const isCacheable = ctx => useMicroCache
