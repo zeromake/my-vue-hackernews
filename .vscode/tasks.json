@@ -1,0 +1,36 @@
+{
+    "version": "0.1.0",
+    "tasks": [
+        {
+            "taskName": "watch",
+            "echoCommand": true,
+            "command": "node",
+            "args": [
+                "server.js"
+            ],
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "webpack",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "pattern": {
+                    "regexp": "^!>(\\w+): (\\S+)?:(\\d+),(\\d+)(?:~(?:(\\d+),)?(\\d+))?: (.*)$",
+                    "severity": 1,
+                    "file": 2,
+                    "line": 3,
+                    "column": 4,
+                    "endLine": 5,
+                    "endColumn": 6,
+                    "message": 7
+                },
+                "watching": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^!>watch",
+                    "endsPattern": "^!>compiler"
+                }
+            }
+        }
+    ]
+}
