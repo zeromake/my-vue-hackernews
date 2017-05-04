@@ -6,7 +6,6 @@
         <span>{{ page }}/{{ maxPage }}</span>
         <router-link v-if="hasMore" :to="'/' + type + '/' + (page + 1)">more &gt;</router-link>
         <a v-else class="disabled">more &gt;</a>
-        <a class="disabled" @click="test">测试</a>
     </div>
     <transition :name="transition">
         <div class="news-list" :key="displayedPage" v-if="displayedPage > 0">

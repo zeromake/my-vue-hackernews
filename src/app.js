@@ -12,7 +12,7 @@ Object.keys(filters).forEach(key => {
     Vue.filter(key, filters[key])
 })
 
-export function createApp () {
+export function createApp (ssrContext) {
     const store = createStore()
     const router = createRouter()
 
@@ -20,6 +20,7 @@ export function createApp () {
     const app = new Vue({
         router,
         store,
+        ssrContext,
         render: h => h(App)
     })
     return { app, router, store }

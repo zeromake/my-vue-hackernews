@@ -85,7 +85,7 @@ app.use(serve('/service-worker.js', './dist/servivce-worker.js'))
 // 1-second microcache.
 const microCache = LRU({
     max: 100,
-    maxAge: 10000000
+    maxAge: 10000
 })
 // 根据请求信息判断是否微缓存
 const isCacheable = ctx => useMicroCache
@@ -144,6 +144,6 @@ router.get('*', isProd ? render: (ctx, next) => {
 app.use(router.routes()).use(router.allowedMethods())
 
 const port = process.env.PORT || 8089
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`server started at localhost:${port}`)
 })

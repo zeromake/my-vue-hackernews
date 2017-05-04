@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV !== 'prodution'
 export default context => {
     return new Promise((resolve, reject) => {
         const s = isDev && Date.now()
-        const { app, router, store } = createApp()
+        const { app, router, store } = createApp(context)
         router.push(context.url)
         router.onReady(() => {
             const matchedComponents = router.getMatchedComponents()
