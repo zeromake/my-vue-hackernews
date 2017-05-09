@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-const createListView = id => () => System.import('../views/CreateListView').then(m => m.default(id))
+const createListView = id => () => import('../views/CreateListView').then(m => m.default(id))
 // import { createListView } from '../views/CreateListView'
 
 export function createRouter () {

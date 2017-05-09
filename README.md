@@ -3,7 +3,7 @@
 [vue-hackernews-2.0](https://github.com/vuejs/vue-hackernews-2.0)'s demo
 
 1. del /user , /item
-2. api on server.js(express)
+2. api on server.js(koa)
 3. more see : [my-blog](http://blog.zeromake.com/pages/vue-ssr)
 
 ## Install
