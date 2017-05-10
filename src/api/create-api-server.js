@@ -1,5 +1,6 @@
 import LRU from 'lru-cache'
-import Axios from 'axios'
+// import Axios from 'axios'
+import fetch from 'node-fetch'
 
 export function createAPI ({ config, version }) {
     let api
@@ -14,12 +15,15 @@ export function createAPI ({ config, version }) {
                 max: 1000,
                 maxAge: 1000 * 60 * 15
             }),
-            cachedIds: {}
+            cachedIds: {},
+            '$get': function (url) {
+                return fetch(url).then(res => res.json())
+            }
         }
         const arr = ['top', 'new']
         arr.forEach(type => {
-            Axios.get(`${api.url}${type}stories.json`).then(res => {
-                api.cachedIds[type] = res.data
+            api.$get(`${api.url}${type}stories.json`).then(res => {
+                api.cachedIds[type] = res
             })
         })
         process.__API__ = api

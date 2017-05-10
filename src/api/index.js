@@ -1,5 +1,5 @@
 import { createAPI } from 'create-api'
-import Axios from 'axios'
+// import Axios from 'axios'
 
 const logRequests = !!process.env.DEBUG_API
 
@@ -27,8 +27,8 @@ function fetch (child) {
         return Promise.resolve(cache.get(child))
     } else {
         return new Promise((resolve, reject) => {
-            Axios.get(api.url + child + '.json').then(res => {
-                const val = res.data
+            api.$get(api.url + child + '.json').then(res => {
+                const val = res
                 if (val) val.__lastUpdate = Date.now()
                 cache && cache.set(child, val)
                 logRequests && console.log(`fetched ${child}.`)
@@ -63,13 +63,13 @@ export function watchList (type, cb) {
     let isOn = true
     let timeoutId = null
     const handler = res => {
-        cb(res.data)
+        cb(res)
     }
     function watchTimeout () {
         if (first) {
             first = false
         } else {
-            Axios.get(`${api.url}${type}stories.json`).then(handler)
+            api.$get(`${api.url}${type}stories.json`).then(handler)
         }
         if (isOn) {
             timeoutId = setTimeout(watchTimeout, 1000 * 60 * 15)

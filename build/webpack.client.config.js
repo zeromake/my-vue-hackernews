@@ -2,6 +2,7 @@ const path = require('path')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const base = require('./webpack.base.config')
+const glob = require('glob')
 const SWPrecachePlugin = require('sw-precache-webpack-plugin')
 const VueSSRClientPlugin = require('vue-server-renderer/client-plugin')
 
@@ -46,7 +47,21 @@ if (process.env.NODE_ENV === 'production'){
             filename: 'service-worker.js',
             stripPrefixMulti: prefixMulti,
             dontCacheBustUrlsMatching: /./,
-            staticFileGlobsIgnorePatterns: [/index\.html$/, /\.map$/]
+            /* dynamicUrlToDependencies: {
+                '/': glob.sync('./dist/*.js'),
+                '/top': glob.sync('./dist/*.js')
+            }, */
+            staticFileGlobsIgnorePatterns: [/\.map$/, /\.json$/],
+            runtimeCaching: [
+                {
+                    urlPattern: '/',
+                    handler: 'networkFirst'
+                },
+                {
+                    urlPattern: /\/(top|new)/,
+                    handler: 'networkFirst'
+                }
+            ]
         })
     )
 }
