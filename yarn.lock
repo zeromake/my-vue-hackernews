@@ -704,8 +704,8 @@ babel-types@^6.19.0, babel-types@^6.23.0, babel-types@^6.24.1:
     to-fast-properties "^1.0.1"
 
 babylon@^6.11.0, babylon@^6.15.0, babylon@^6.17.0:
-  version "6.17.0"
-  resolved "http://registry.npm.taobao.org/babylon/download/babylon-6.17.0.tgz#37da948878488b9c4e3c4038893fa3314b3fc932"
+  version "6.17.1"
+  resolved "http://registry.npm.taobao.org/babylon/download/babylon-6.17.1.tgz#17f14fddf361b695981fe679385e4f1c01ebd86f"
 
 balanced-match@^0.4.1, balanced-match@^0.4.2:
   version "0.4.2"
@@ -985,8 +985,8 @@ clap@^1.0.9:
     chalk "^1.1.3"
 
 clean-css@4.0.x:
-  version "4.0.12"
-  resolved "http://registry.npm.taobao.org/clean-css/download/clean-css-4.0.12.tgz#a02e61707f1840bd3338f54dbc9acbda4e772fa3"
+  version "4.0.13"
+  resolved "http://registry.npm.taobao.org/clean-css/download/clean-css-4.0.13.tgz#feb2a176062d72a6c3e624d9213cac6a0c485e80"
   dependencies:
     source-map "0.5.x"
 
@@ -1597,8 +1597,8 @@ ee-first@1.1.1:
   resolved "http://registry.npm.taobao.org/ee-first/download/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
 
 electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.9:
-  version "1.3.9"
-  resolved "http://registry.npm.taobao.org/electron-to-chromium/download/electron-to-chromium-1.3.9.tgz#db1cba2a26aebcca2f7f5b8b034554468609157d"
+  version "1.3.10"
+  resolved "http://registry.npm.taobao.org/electron-to-chromium/download/electron-to-chromium-1.3.10.tgz#63d62b785471f0d8dda85199d64579de8a449f08"
 
 elliptic@^6.0.0:
   version "6.4.0"
@@ -1675,8 +1675,8 @@ es-to-primitive@^1.1.1:
     is-symbol "^1.0.1"
 
 es5-ext@^0.10.14, es5-ext@^0.10.9, es5-ext@~0.10.14:
-  version "0.10.15"
-  resolved "http://registry.npm.taobao.org/es5-ext/download/es5-ext-0.10.15.tgz#c330a5934c1ee21284a7c081a86e5fd937c91ea6"
+  version "0.10.16"
+  resolved "http://registry.npm.taobao.org/es5-ext/download/es5-ext-0.10.16.tgz#1ef1b04f3d09db6a5d630226d62202f2e425e45a"
   dependencies:
     es6-iterator "2"
     es6-symbol "~3.1"
@@ -4809,9 +4809,9 @@ vue-router@^2.5.3:
   version "2.5.3"
   resolved "http://registry.npm.taobao.org/vue-router/download/vue-router-2.5.3.tgz#073783f564b6aece6c8a59c63e298dc2aabfb51b"
 
-vue-server-renderer@^2.3.2:
-  version "2.3.2"
-  resolved "http://registry.npm.taobao.org/vue-server-renderer/download/vue-server-renderer-2.3.2.tgz#01bfde9c524ef041873f1e2d18f9356c620b4f8c"
+vue-server-renderer@^2.3.3:
+  version "2.3.3"
+  resolved "http://registry.npm.taobao.org/vue-server-renderer/download/vue-server-renderer-2.3.3.tgz#1f450f8a4541b9dd3b084d6470939f82781c3e0a"
   dependencies:
     chalk "^1.1.3"
     hash-sum "^1.0.2"
@@ -4829,9 +4829,9 @@ vue-style-loader@^3.0.0:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
-vue-template-compiler@^2.3.2:
-  version "2.3.2"
-  resolved "http://registry.npm.taobao.org/vue-template-compiler/download/vue-template-compiler-2.3.2.tgz#d48a7f53df5f497033827182ceb4f0d340803017"
+vue-template-compiler@^2.3.3:
+  version "2.3.3"
+  resolved "http://registry.npm.taobao.org/vue-template-compiler/download/vue-template-compiler-2.3.3.tgz#b5bab9ec57309c906b82a78c81a02179dbc2f470"
   dependencies:
     de-indent "^1.0.2"
     he "^1.1.0"
@@ -4840,9 +4840,9 @@ vue-template-es2015-compiler@^1.2.2:
   version "1.5.2"
   resolved "http://registry.npm.taobao.org/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.5.2.tgz#a0a6c50c941d2a4abda963f2f42c337ac450ee95"
 
-vue@^2.3.2:
-  version "2.3.2"
-  resolved "http://registry.npm.taobao.org/vue/download/vue-2.3.2.tgz#9e52aae3593480be235ff227557837e69f98203a"
+vue@^2.3.3:
+  version "2.3.3"
+  resolved "http://registry.npm.taobao.org/vue/download/vue-2.3.3.tgz#d1eaa8fde5240735a4563e74f2c7fead9cbb064c"
 
 vuex-router-sync@^4.1.2:
   version "4.1.2"
@@ -4902,7 +4902,7 @@ webpack-sources@^0.2.3:
     source-list-map "^1.1.1"
     source-map "~0.5.3"
 
-webpack@^2.4.1:
+webpack@^2.5.1:
   version "2.5.1"
   resolved "http://registry.npm.taobao.org/webpack/download/webpack-2.5.1.tgz#61742f0cf8af555b87460a9cd8bba2f1e3ee2fce"
   dependencies:
@@ -4947,10 +4947,10 @@ which@^1.2.8, which@^1.2.9:
     isexe "^2.0.0"
 
 wide-align@^1.1.0:
-  version "1.1.0"
-  resolved "http://registry.npm.taobao.org/wide-align/download/wide-align-1.1.0.tgz#40edde802a71fea1f070da3e62dcda2e7add96ad"
+  version "1.1.1"
+  resolved "http://registry.npm.taobao.org/wide-align/download/wide-align-1.1.1.tgz#d2ea8aa2db2e66467e8b60cc3e897de3bc4429e6"
   dependencies:
-    string-width "^1.0.1"
+    string-width "^2.0.0"
 
 widest-line@^1.0.0:
   version "1.0.0"

@@ -1,4 +1,6 @@
 const fs = require('fs')
+const co = require('co')
+const pify = require('pify')
 const path = require('path')
 const Koa = require('koa')
 const KoaRuoter = require('koa-router')
@@ -6,6 +8,11 @@ const KoaServe = require('./serve')
 const { createBundleRenderer } = require('vue-server-renderer')
 const LRU = require('lru-cache')
 
+const fileSystem = {
+    readFile: pify(fs.readFile),
+    mkdir: pify(fs.mkdir),
+    writeFile: pify(fs.writeFile)
+}
 const resolve = file => path.resolve(__dirname, file)
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -83,9 +90,9 @@ function render (url) {
             if (err) {
                 return handleError(err)
             }
-            resolve({html, url})
-            if (!isProd) {
-                console.log(`whole request: ${Date.now() - s}ms`)
+            resolve(html)
+            if (isProd) {
+                console.log(`whole request-${url}: ${Date.now() - s}ms`)
             }
         })
     })
@@ -95,34 +102,37 @@ app.use(router.routes()).use(router.allowedMethods())
 const port = process.env.PORT || 8089
 const listens = app.listen(port, '0.0.0.0', () => {
     console.log(`server started at localhost:${port}`)
-    function generate () {
-        const s = Date.now()
+    const generate = () => co(function * () {
         const func = render
         const urls = [
-            '',
             '/top',
+            '',
             '/new',
             '/top/1',
             '/top/2',
             '/new/1',
             '/new/2'
         ]
-        Promise.all(urls.map(url =>func(url))).then(html_arr => {
-            html_arr.forEach(({html, url})=> {
-                if (!fs.existsSync(resolve(`../dist${url}`))) {
-                    fs.mkdirSync(resolve(`../dist${url}`))
-                }
-                fs.writeFileSync(resolve(`../dist${url}/index.html`), html)
-            })
+        for (let i = 0; i < urls.length; i++) {
+            const url = urls[i]
+            if (!fs.existsSync(resolve(`../dist${url}`))) {
+                yield fileSystem.mkdir(resolve(`../dist${url}`))
+            }
+            const html = yield func(url)
+            yield fileSystem.writeFile(resolve(`../dist${url}/index.html`), html)
+        }
+    })
+    const s = Date.now()
+    if (isProd) {
+        generate().then(() => {
+            console.log(`generate: ${Date.now() - s}ms`)
+            listens.close(()=> {process.exit()})
+        })
+    } else {
+        readyPromise.then(generate).then(() => {
             console.log(`generate: ${Date.now() - s}ms`)
             listens.close(()=> {process.exit()})
         })
     }
-    if (isProd) {
-        generate()
-    } else {
-        readyPromise.then(generate)
-    }
-    
-    
+
 })
