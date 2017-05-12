@@ -55,8 +55,8 @@ const serve = (url, path, cache) => KoaServe(url, {
 })
 
 // 模拟api
-app.use(serve('/api/topstories.json', './public/api/topstories.json'))
-app.use(serve('/api/newstories.json', './public/api/newstories.json'))
+app.use(serve('/api/topstories.json', './build/api/topstories.json'))
+app.use(serve('/api/newstories.json', './build/api/newstories.json'))
 router.get('/api/item/:id.json', (ctx, next) => {
     const id = ctx.params.id
     const time = parseInt(Math.random() * (1487396700 - 1400000000 + 1) + 1400000000)
