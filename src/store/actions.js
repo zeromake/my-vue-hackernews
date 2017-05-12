@@ -1,6 +1,7 @@
 import {
   fetchUser,
   fetchItems,
+  fetchPage,
   fetchIdsByType
 } from '../api'
 
@@ -12,6 +13,10 @@ export default {
             .then(() => dispatch('ENSURE_ACTIVE_ITEMS'))
     },
     ENSURE_ACTIVE_ITEMS: ({ dispatch, getters }) => {
+        /* return dispatch('FETCH_PAGE', {
+            type: state.activeType,
+            page: +state.route.params.page || 1
+        }) */
         return dispatch('FETCH_ITEMS', {
             ids: getters.activeIds
         })
@@ -33,6 +38,9 @@ export default {
         } else {
             return Promise.resolve()
         }
+    },
+    FETCH_PAGE: ({ commit }, { type, page }) => {
+        return fetchPage(type, page).then(items => commit('SET_ITEMS', { items }))
     },
     FETCH_USER: ({ commit, state }, { id }) => {
         return state.users[id]

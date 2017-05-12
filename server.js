@@ -6,6 +6,8 @@ const KoaServe = require('./build/serve')
 const serialize = require('serialize-javascript')
 const { createBundleRenderer } = require('vue-server-renderer')
 const LRU = require('lru-cache')
+const topstories = require('./build/api/topstories.json')
+const newstories = require('./build/api/newstories.json')
 
 const resolve = file => path.resolve(__dirname, file)
 
@@ -55,23 +57,44 @@ const serve = (url, path, cache) => KoaServe(url, {
 })
 
 // 模拟api
-app.use(serve('/api/topstories.json', './build/api/topstories.json'))
-app.use(serve('/api/newstories.json', './build/api/newstories.json'))
-router.get('/api/item/:id.json', (ctx, next) => {
-    const id = ctx.params.id
-    const time = parseInt(Math.random() * (1487396700 - 1400000000 + 1) + 1400000000)
-    const item = {
-        by: 'zero' + id,
+router.get('/api/newstories.json', (ctx, next) => {
+    ctx.body = newstories
+})
+router.get('/api/topstories.json', (ctx, next) => {
+    ctx.body = topstories
+})
+function getItem(itemId) {
+    const time = ~~(Math.random() * (1487396700 - 1400000000 + 1) + 1400000000)
+    return {
+        by: 'zero' + itemId,
         descendants: 0,
-        id: id,
-        score: id - 13664000,
+        id: itemId,
+        score: itemId - 13664000,
         time: time,
-        title: `测试Item:${id} - ${time}`,
+        title: `测试Item:${itemId} - ${time}`,
         type: 'story',
-        url: `/api/item/${id}.json`
+        url: `/api/item/${itemId}.json`
 
     }
-    ctx.body = item
+}
+router.get('/api/item/:id.json', (ctx, next) => {
+    const itemId = ctx.params.id
+    ctx.body = getItem(itemId)
+})
+typeObj = {
+    'new': newstories,
+    'top': topstories
+}
+router.get('/api/:type/:page.json', (ctx, next) => {
+    const type = ctx.params.type
+    const page = +ctx.params.page || 1
+    const typestories = typeObj[type]
+    if (typestories) {
+        const ids = typestories.slice((page - 1) * 20, page * 20)
+        ctx.body = ids.map(i => getItem(i))
+    } else {
+        ctx.body = []
+    }
 })
 
 // 加载和设置static
@@ -80,7 +103,7 @@ router.get('/api/item/:id.json', (ctx, next) => {
 app.use(serve('/dist', './dist', true))
 app.use(serve('/public', './public', true))
 // app.use(serve('/manifest.json','./manifest.json', true))
-app.use(serve('/service-worker.js', './dist/servivce-worker.js'))
+// app.use(serve('/service-worker.js', './dist/servivce-worker.js'))
 
 // 1-second microcache.
 const microCache = LRU({

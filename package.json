@@ -12,7 +12,8 @@
     "build": "rimraf dist && npm run build:client && npm run build:server",
     "build:client": "cross-env NODE_ENV=production webpack --config build/webpack.client.config.js --progress --hide-modules",
     "build:server": "cross-env NODE_ENV=production webpack --config build/webpack.server.config.js --progress --hide-modules",
-    "generate": "cross-env NODE_ENV=production node build/generate.js"
+    "generate": "cross-env NODE_ENV=production node build/generate.js",
+    "static": "rimraf docs && npm run build && npm run generate"
   },
   "dependencies": {
     "axios": "^0.16.1",
@@ -49,7 +50,9 @@
     "file-loader": "^0.11.1",
     "format-webpack-stats-errors-warnings": "^2.1.0",
     "friendly-errors-webpack-plugin": "^1.6.1",
+    "fs-extra": "^3.0.1",
     "ghooks": "^2.0.0",
+    "html-minifier": "^3.4.4",
     "html-webpack-plugin": "^2.28.0",
     "rimraf": "^2.6.1",
     "stylus": "^0.54.5",

@@ -50,7 +50,9 @@ export function fetchItem (id) {
 export function fetchItems (ids) {
     return Promise.all(ids.map(id => fetchItem(id)))
 }
-
+export function fetchPage (type, page) {
+    return fetch(`${type}/${page}`)
+}
 export function fetchUser (id) {
     return fetch(`user/${id}`)
 }
