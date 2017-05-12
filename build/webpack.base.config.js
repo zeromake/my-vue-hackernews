@@ -78,7 +78,7 @@ module.exports = {
         maxEntrypointSize: 300000,
         hints: isProd ? 'warning' : false
     },
-    plugins: isProd 
+    plugins: isProd
         ? [
             new webpack.optimize.UglifyJsPlugin({
                 compress: { warnings: false }

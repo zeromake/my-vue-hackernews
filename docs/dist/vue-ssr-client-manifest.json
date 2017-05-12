@@ -1,14 +1,14 @@
 {
-  "publicPath": "/dist/",
+  "publicPath": "/my-vue-hackernews/dist/",
   "all": [
     "0-7ef401d5c205a5a102fb.js",
     "vendor-130b67caed6946bc94bd.js",
     "app-c8ea220a67c5ccb1eab5.js",
-    "manifest-d7f0cdd445c19beb4d82.js",
+    "manifest-ae752b55f17dbbef55d9.js",
     "common.c8ea220a67c5ccb1eab5.css"
   ],
   "initial": [
-    "manifest-d7f0cdd445c19beb4d82.js",
+    "manifest-ae752b55f17dbbef55d9.js",
     "vendor-130b67caed6946bc94bd.js",
     "app-c8ea220a67c5ccb1eab5.js"
   ],
